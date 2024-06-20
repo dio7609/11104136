@@ -1,0 +1,71 @@
+let roses = 0;
+let item1Quantity = 0;
+let item2Quantity = 0;
+let autoRosesPerSecond = 0;
+
+document.getElementById('main').addEventListener('click', (event) => {
+    addRose(event.clientX, event.clientY);
+});
+
+document.getElementById('collect-roses').addEventListener('click', () => {
+    collectRoses();
+});
+
+document.querySelectorAll('.exchange-button').forEach((button, index) => {
+    button.addEventListener('click', () => {
+        const cost = parseInt(button.getAttribute('data-cost'));
+        if (roses >= cost) {
+            roses -= cost;
+            document.getElementById('roses').innerText = roses;
+            alert(`成功兌換 物品${index + 1}`);
+            if (index === 0) {
+                item1Quantity++;
+                document.getElementById('item1-quantity').innerText = item1Quantity;
+            } else if (index === 1) {
+                item2Quantity++;
+                document.getElementById('item2-quantity').innerText = item2Quantity;
+            }
+        } else {
+            alert('玫瑰數量不足');
+        }
+    });
+});
+
+// 自動增加玫瑰數量的計時器
+setInterval(() => {
+    roses += autoRosesPerSecond; // 基本的自動增加玫瑰數量
+    
+    // 更新物品一和物品二的自動增加玫瑰數量
+    item1Quantity += 1 * autoRosesPerSecond; // 物品一每秒自動增加1 * 物品一的數量
+    item2Quantity += 2 * autoRosesPerSecond; // 物品二每秒自動增加2 * 物品二的數量
+
+    // 確保顯示整數
+    document.getElementById('item1-quantity').innerText = Math.floor(item1Quantity);
+    document.getElementById('item2-quantity').innerText = Math.floor(item2Quantity);
+
+    // 更新總玫瑰數量
+    document.getElementById('roses').innerText = roses;
+}, 1000); // 每秒執行一次
+
+function addRose(x, y) {
+    const rose = document.createElement('div');
+    rose.className = 'rose';
+    
+    // 計算玫瑰應該出現的準確位置
+    const mainRect = document.getElementById('main').getBoundingClientRect();
+    const offsetX = x - mainRect.left;
+    const offsetY = y - mainRect.top;
+    
+    rose.style.left = `${offsetX - 15}px`; // 減去15是為了調整玫瑰圖片的中心點
+    rose.style.top = `${offsetY - 15}px`;
+    
+    document.getElementById('main').appendChild(rose);
+}
+
+function collectRoses() {
+    roses += document.getElementsByClassName('rose').length; // 收集畫面上的所有玫瑰
+    document.getElementById('roses').innerText = roses;
+    document.querySelectorAll('.rose').forEach(rose => {
+        rose.remove(); // 移除所有玫瑰
+    });
+}
